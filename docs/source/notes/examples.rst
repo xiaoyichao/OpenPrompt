@@ -42,7 +42,7 @@ Step 2. Obtain a PLM
 
 Choose a PLM to support your task. Different models have different attributes, 
 we encourge you to use OpenPrompt to explore the potential of various PLMs.
-OpenPrompt is compatible with models on `huggingface <https://huggingface.co/transformers/>`_, 
+OpenPrompt is compatible with models on `huggingface <https://huggingface.co/transformers4token/>`_, 
 the following models have been tested:
 
 * Masked Language Models (MLM): ``BERT``, ``RoBERTa``, ``ALBERT``

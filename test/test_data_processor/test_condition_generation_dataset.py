@@ -3,7 +3,7 @@ from os.path import dirname as d
 from os.path import abspath, join
 root_dir = d(d(d(abspath(__file__))))
 sys.path.append(root_dir)
-from openprompt.data_utils.conditional_generation_dataset import PROCESSORS
+from openprompt4distilbert.data_utils.conditional_generation_dataset import PROCESSORS
 
 base_path = os.path.join(root_dir, "datasets/CondGen")
 

@@ -20,7 +20,7 @@ raw_dataset = load_from_disk("/home/hushengding/huggingface_datasets/saved_to_di
 # Thirdly upload the saved content into the machiine in cluster.
 # Then use `load_from_disk` method to load the dataset.
 
-from openprompt.data_utils import InputExample
+from openprompt4distilbert.data_utils import InputExample
 
 dataset = {}
 for split in ['train', 'validation', 'test']:
@@ -31,12 +31,12 @@ for split in ['train', 'validation', 'test']:
 print(dataset['train'][0])
 
 # You can load the plm related things provided by openprompt simply by calling:
-from openprompt.plms import load_plm
+from openprompt4distilbert.plms import load_plm
 plm, tokenizer, model_config, WrapperClass = load_plm("t5", "t5-base")
 
 # Constructing Template
 # A template can be constructed from the yaml config, but it can also be constructed by directly passing arguments.
-from openprompt.prompts import ManualTemplate
+from openprompt4distilbert.prompts import ManualTemplate
 template_text = '{"placeholder":"text_a"} Question: {"placeholder":"text_b"}? Is it correct? {"mask"}.'
 mytemplate = ManualTemplate(tokenizer=tokenizer, text=template_text)
 
@@ -54,7 +54,7 @@ print(wrapped_example)
 # The loss is calcaluted at <extra_id_0>. Thus passing decoder_max_length=3 saves the space
 wrapped_t5tokenizer = WrapperClass(max_seq_length=128, decoder_max_length=3, tokenizer=tokenizer,truncate_method="head")
 # or
-from openprompt.plms import T5TokenizerWrapper
+from openprompt4distilbert.plms import T5TokenizerWrapper
 wrapped_t5tokenizer= T5TokenizerWrapper(max_seq_length=128, decoder_max_length=3, tokenizer=tokenizer,truncate_method="head")
 
 # You can see what a tokenized example looks like by
@@ -75,7 +75,7 @@ for split in ['train', 'validation', 'test']:
 
 
 # We provide a `PromptDataLoader` class to help you do all the above matters and wrap them into an `torch.DataLoader` style iterator.
-from openprompt import PromptDataLoader
+from openprompt4distilbert import PromptDataLoader
 
 train_dataloader = PromptDataLoader(dataset=dataset["train"], template=mytemplate, tokenizer=tokenizer,
     tokenizer_wrapper_class=WrapperClass, max_seq_length=256, decoder_max_length=3,
@@ -87,7 +87,7 @@ train_dataloader = PromptDataLoader(dataset=dataset["train"], template=mytemplat
 # Define the verbalizer
 # In classification, you need to define your verbalizer, which is a mapping from logits on the vocabulary to the final label probability. Let's have a look at the verbalizer details:
 
-from openprompt.prompts import ManualVerbalizer
+from openprompt4distilbert.prompts import ManualVerbalizer
 import torch
 
 # for example the verbalizer contains multiple label words in each class
@@ -102,7 +102,7 @@ print(myverbalizer.process_logits(logits)) # see what the verbalizer do
 # Although you can manually combine the plm, template, verbalizer together, we provide a pipeline
 # model which take the batched data from the PromptDataLoader and produce a class-wise logits
 
-from openprompt import PromptForClassification
+from openprompt4distilbert import PromptForClassification
 
 use_cuda = True
 prompt_model = PromptForClassification(plm=plm,template=mytemplate, verbalizer=myverbalizer, freeze_plm=False)
@@ -110,7 +110,7 @@ if use_cuda:
     prompt_model=  prompt_model.cuda()
 
 # Now the training is standard
-from transformers import  AdamW, get_linear_schedule_with_warmup
+from transformers4token import  AdamW, get_linear_schedule_with_warmup
 loss_func = torch.nn.CrossEntropyLoss()
 no_decay = ['bias', 'LayerNorm.weight']
 # it's always good practice to set no decay to biase and LayerNorm parameters

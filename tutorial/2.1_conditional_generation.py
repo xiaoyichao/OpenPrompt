@@ -17,7 +17,7 @@ parser.add_argument("--model_name_or_path", default='t5-base')
 args = parser.parse_args()
 print(args)
 
-from openprompt.data_utils.conditional_generation_dataset import WebNLGProcessor
+from openprompt4distilbert.data_utils.conditional_generation_dataset import WebNLGProcessor
 dataset = {}
 dataset['train'] = WebNLGProcessor().get_train_examples("./datasets/CondGen/webnlg_2017/")
 dataset['validation'] = WebNLGProcessor().get_dev_examples("./datasets/CondGen/webnlg_2017/")
@@ -25,11 +25,11 @@ dataset['test'] = WebNLGProcessor().get_test_examples("./datasets/CondGen/webnlg
 
 
 # load a pretrained model, its tokenizer, its config, and its TokenzerWrapper by one function
-from openprompt.plms import load_plm
+from openprompt4distilbert.plms import load_plm
 plm, tokenizer, model_config, WrapperClass = load_plm(args.model, args.model_name_or_path)
 
 # Instantiating the PrefixTuning Template !
-from openprompt.prompts.prefix_tuning_template import PrefixTuningTemplate
+from openprompt4distilbert.prompts.prefix_tuning_template import PrefixTuningTemplate
 # we can use a plain text as the default setting
 # i.e.
 # mytemplate = PrefixTuningTemplate(model=plm, tokenizer=tokenizer)
@@ -46,7 +46,7 @@ print(wrapped_example)
 
 # Your can loop over the dataset by yourself by subsequently call mytemplate.wrap_one_example  and WrapperClass().tokenizer()
 # but we have provide a PromptDataLoader for you.
-from openprompt import PromptDataLoader
+from openprompt4distilbert import PromptDataLoader
 train_dataloader = PromptDataLoader(dataset=dataset["train"], template=mytemplate, tokenizer=tokenizer,
     tokenizer_wrapper_class=WrapperClass, max_seq_length=256, decoder_max_length=256,
     batch_size=5,shuffle=True, teacher_forcing=True, predict_eos_token=True, # be sure to pass predict_eos_token=True if your template doesn't contain one, or you model may fail to stop generation.
@@ -63,14 +63,14 @@ test_dataloader = PromptDataLoader(dataset=dataset["test"], template=mytemplate,
     truncate_method="head")
 
 # load the pipeline model PromptForGeneration.
-from openprompt import PromptForGeneration
+from openprompt4distilbert import PromptForGeneration
 use_cuda = True
 prompt_model = PromptForGeneration(plm=plm,template=mytemplate, freeze_plm=True,tokenizer=tokenizer, plm_eval_mode=args.plm_eval_mode)
 if use_cuda:
     prompt_model=  prompt_model.cuda()
 
 
-from transformers import AdamW
+from transformers4token import AdamW
 # Follow PrefixTuning（https://github.com/XiangLi1999/PrefixTuning), we also fix the language model
 # only include the template's parameters in training.
 
@@ -89,13 +89,13 @@ optimizer_grouped_parameters = [
 
 optimizer = AdamW(optimizer_grouped_parameters, lr=args.lr, eps=1e-8)
 
-from transformers.optimization import get_linear_schedule_with_warmup
+from transformers4token.optimization import get_linear_schedule_with_warmup
 
 tot_step  = len(train_dataloader)*5
 scheduler = get_linear_schedule_with_warmup(optimizer, 0, tot_step)
 
 # We provide generation a generation metric, you can also define your own. Note that it's not directly comparable to WebNLG's scripts evaluation.
-from openprompt.utils.metrics import generation_metric
+from openprompt4distilbert.utils.metrics import generation_metric
 # Define evaluate function
 def evaluate(prompt_model, dataloader):
     generated_sentence = []

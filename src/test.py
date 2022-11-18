@@ -1,9 +1,14 @@
-from openprompt.data_utils import InputExample
+import os
+import sys
+os.chdir(sys.path[0])
+sys.path.append("../")
+
+from openprompt4distilbert.data_utils import InputExample
 classes = [ # There are two classes in Sentiment Analysis, one for negative and one for positive
-    "收藏",
-    "点赞或评论",
-    "点击",
-    "没有点击",   
+    "4",
+    "3",
+    "2",
+    "1",   
 ]
 dataset = [ # For simplicity, there's only two examples
     # text_a is the input text of the data, some other datasets may have multiple input sentences in one example.
@@ -21,36 +26,38 @@ dataset = [ # For simplicity, there's only two examples
     ),
 ]
 
-from openprompt.plms import load_plm
-# distilbert_torch_path = "/data/search_opt_model/topk_opt/distilbert/distilbert_torch"
-# plm, tokenizer, model_config, WrapperClass = load_plm("bert", distilbert_torch_path)
+from openprompt4distilbert.plms import load_plm
+distilbert_torch_path = "/data/search_opt_model/topk_opt/distilbert/distilbert_torch"
+plm, tokenizer, model_config, WrapperClass = load_plm("distilbert", distilbert_torch_path)
 
-plm, tokenizer, model_config, WrapperClass = load_plm("bert", "bert-base-cased")
+# plm, tokenizer, model_config, WrapperClass = load_plm("bert", "bert-base-cased")
 
-from openprompt.prompts import ManualTemplate
+from openprompt4distilbert.prompts import ManualTemplate
 promptTemplate = ManualTemplate(
-    text = '{"placeholder":"text_a"}和{"placeholder":"text_b"}是{"mask"}的。',
+    text = '用户的搜索词是{"placeholder":"text_a"}，展示的内容是{"placeholder":"text_b"}，用户认为搜索词和内容的相关性是{"mask"}分。',
     tokenizer = tokenizer,
 )
 
-from openprompt.prompts import ManualVerbalizer
+from openprompt4distilbert.prompts import ManualVerbalizer
 promptVerbalizer = ManualVerbalizer(
     classes = classes,
     label_words = {
-        "related": ["相关"],
-        "not related": ["不相关"],
+        "4": ["收藏"],
+        "3": ["评论或者点赞"],
+        "2": ["有效点击"],
+        "1": ["无点击或无效点击"],
     },
     tokenizer = tokenizer,
 )
 
-from openprompt import PromptForClassification
+from openprompt4distilbert import PromptForClassification
 promptModel = PromptForClassification(
     template = promptTemplate,
     plm = plm,
     verbalizer = promptVerbalizer,
 )
 
-from openprompt import PromptDataLoader
+from openprompt4distilbert import PromptDataLoader
 data_loader = PromptDataLoader(
     dataset = dataset,
     tokenizer = tokenizer,
@@ -59,10 +66,10 @@ data_loader = PromptDataLoader(
 )
 
 import torch
-from transformers import  AdamW, get_linear_schedule_with_warmup
+from transformers4token import  AdamW, get_linear_schedule_with_warmup
 use_cuda = True
 # use_cuda = False
-from transformers import  AdamW, get_linear_schedule_with_warmup
+from transformers4token import  AdamW, get_linear_schedule_with_warmup
 loss_func = torch.nn.CrossEntropyLoss()
 
 no_decay = ['bias', 'LayerNorm.weight']
@@ -100,7 +107,7 @@ for epoch in range(3):
 
         logits = promptModel(inputs)
         labels = inputs['label']
-        loss = loss_func(logits, labels)*1024
+        loss = loss_func(logits, labels)
         loss.backward()
         # print(promptModel.template.soft_embeds.grad)
         tot_loss += loss.item()

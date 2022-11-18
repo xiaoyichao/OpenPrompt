@@ -2,9 +2,9 @@ import sys
 sys.path.append(".")
 sys.path.append("..")
 
-from openprompt.data_utils import InputExample
-from openprompt.data_utils.ZH import ChnSentiCorp
-from openprompt.data_utils.data_sampler import FewShotSampler
+from openprompt4distilbert.data_utils import InputExample
+from openprompt4distilbert.data_utils.ZH import ChnSentiCorp
+from openprompt4distilbert.data_utils.data_sampler import FewShotSampler
 processor = ChnSentiCorp()
 # TODO other chinese datasets are not fully adapted yet
 trainset = processor.get_train_examples("datasets/ZH/ChnSentiCorp")
@@ -15,17 +15,17 @@ devset = processor.get_dev_examples("datasets/ZH/ChnSentiCorp")
 import bminf.torch as bt
 use_cpm_version = 2
 if use_cpm_version == 1:
-    from openprompt.plms.lm import LMTokenizerWrapper
+    from openprompt4distilbert.plms.lm import LMTokenizerWrapper
     plm = bt.models.CPM1()
     tokenizer = plm.tokenizer
     WrapperClass = LMTokenizerWrapper
 elif use_cpm_version == 2:
-    from openprompt.plms.seq2seq import CPM2TokenizerWrapper
+    from openprompt4distilbert.plms.seq2seq import CPM2TokenizerWrapper
     plm = bt.models.CPM2()
     tokenizer = plm.tokenizer
     WrapperClass = CPM2TokenizerWrapper
 
-from openprompt.prompts import SoftTemplate, MixedTemplate
+from openprompt4distilbert.prompts import SoftTemplate, MixedTemplate
 
 mytemplate = SoftTemplate(
     model = plm,
@@ -41,7 +41,7 @@ print("Wrapped Example:", wrapped_example)
 # ## Define the verbalizer
 # In classification, you need to define your verbalizer, which is a mapping from logits on the vocabulary to the final label probability. Let's have a look at the verbalizer details:
 
-from openprompt.prompts import ManualVerbalizer
+from openprompt4distilbert.prompts import ManualVerbalizer
 import torch
 
 # for example the verbalizer contains multiple label words in each class
@@ -49,7 +49,7 @@ label_words = processor.labels_mapped
 myverbalizer = ManualVerbalizer(tokenizer, num_classes=len(label_words), label_words=label_words, prefix = '')
 print("Verbalizer token id:", myverbalizer.label_words_ids.data)
 
-from openprompt import PromptForClassification
+from openprompt4distilbert import PromptForClassification
 
 use_cuda = True
 prompt_model = PromptForClassification(plm=plm, template=mytemplate, verbalizer=myverbalizer, freeze_plm=False)
@@ -58,7 +58,7 @@ if use_cuda:
 
 # ## below is standard training
 
-from openprompt import PromptDataLoader
+from openprompt4distilbert import PromptDataLoader
 
 train_dataloader = PromptDataLoader(dataset=trainset, template=mytemplate, tokenizer=tokenizer,
     tokenizer_wrapper_class=WrapperClass, max_seq_length=256, decoder_max_length=8,
@@ -71,7 +71,7 @@ validation_dataloader = PromptDataLoader(dataset=devset, template=mytemplate, to
     batch_size=16, shuffle=False, teacher_forcing=False, predict_eos_token=False,
     truncate_method="head")
 
-from transformers import  AdamW, get_linear_schedule_with_warmup
+from transformers4token import  AdamW, get_linear_schedule_with_warmup
 loss_func = torch.nn.CrossEntropyLoss()
 
 no_decay = ['bias', 'LayerNorm.weight']

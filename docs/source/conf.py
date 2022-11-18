@@ -3,8 +3,8 @@ sys.path.insert(0, "../../")
 import datetime
 import sphinx_rtd_theme
 import doctest
-import openprompt
-from openprompt import prompts
+import openprompt4distilbert
+from openprompt4distilbert import prompts
 
 
 
@@ -52,7 +52,7 @@ html_theme_options = {
 html_static_path = ['_static']
 html_css_files = ['css/custom.css']
 html_js_files = ['js/custom.js']
-rst_context = {'openprompt': openprompt}
+rst_context = {'openprompt': openprompt4distilbert}
 
 add_module_names = False
 

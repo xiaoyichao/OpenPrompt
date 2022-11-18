@@ -1,28 +1,28 @@
 
-from openprompt.data_utils.text_classification_dataset import AgnewsProcessor
+from openprompt4distilbert.data_utils.text_classification_dataset import AgnewsProcessor
 
 
 dataset = {}
 dataset['train'] = AgnewsProcessor().get_train_examples("./datasets/TextClassification/agnews")
 # We sample a few examples to form the few-shot training pool
-from openprompt.data_utils.data_sampler import FewShotSampler
+from openprompt4distilbert.data_utils.data_sampler import FewShotSampler
 sampler  = FewShotSampler(num_examples_per_label=16, num_examples_per_label_dev=16, also_sample_dev=True)
 dataset['train'], dataset['validation'] = sampler(dataset['train'])
 dataset['test'] = AgnewsProcessor().get_test_examples("./datasets/TextClassification/agnews")
 
-from openprompt.plms import load_plm
+from openprompt4distilbert.plms import load_plm
 
 plm, tokenizer, model_config, WrapperClass = load_plm("t5", "t5-base")
 
 
-from openprompt.prompts import ManualTemplate
+from openprompt4distilbert.prompts import ManualTemplate
 mytemplate = ManualTemplate(tokenizer=tokenizer, text='{"placeholder":"text_a"} {"placeholder":"text_b"} In this sentence, the topic is {"mask"}.')
 
 
 wrapped_example = mytemplate.wrap_one_example(dataset['train'][0])
 print(wrapped_example)
 
-from openprompt import PromptDataLoader
+from openprompt4distilbert import PromptDataLoader
 
 train_dataloader = PromptDataLoader(dataset=dataset["train"], template=mytemplate, tokenizer=tokenizer,
     tokenizer_wrapper_class=WrapperClass, max_seq_length=256, decoder_max_length=3,
@@ -33,7 +33,7 @@ train_dataloader = PromptDataLoader(dataset=dataset["train"], template=mytemplat
 # ## Define the verbalizer
 # In classification, you need to define your verbalizer, which is a mapping from logits on the vocabulary to the final label probability. Let's have a look at the verbalizer details:
 
-from openprompt.prompts import SoftVerbalizer
+from openprompt4distilbert.prompts import SoftVerbalizer
 import torch
 
 # for example the verbalizer contains multiple label words in each class
@@ -43,7 +43,7 @@ import torch
 myverbalizer = SoftVerbalizer(tokenizer, plm, num_classes=4)
 
 
-from openprompt import PromptForClassification
+from openprompt4distilbert import PromptForClassification
 
 use_cuda = True
 prompt_model = PromptForClassification(plm=plm,template=mytemplate, verbalizer=myverbalizer, freeze_plm=False)
@@ -53,7 +53,7 @@ if use_cuda:
 # ## below is standard training
 
 
-from transformers import  AdamW, get_linear_schedule_with_warmup
+from transformers4token import  AdamW, get_linear_schedule_with_warmup
 loss_func = torch.nn.CrossEntropyLoss()
 
 no_decay = ['bias', 'LayerNorm.weight']

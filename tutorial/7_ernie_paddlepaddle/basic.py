@@ -2,8 +2,8 @@ import pandas as pd
 import paddle
 import paddlenlp
 paddle.set_device('cpu')
-from paddlenlp.transformers.ernie.tokenizer import ErnieTokenizer
-from paddlenlp.transformers.ernie.modeling import ErnieForMaskedLM
+from paddlenlp.transformers4token.ernie.tokenizer import ErnieTokenizer
+from paddlenlp.transformers4token.ernie.modeling import ErnieForMaskedLM
 from TokenizerWrapper import ErnieMLMTokenizerWrapper
 from data_utils import InputExample, InputFeatures
 from template import ErnieManualTemplate

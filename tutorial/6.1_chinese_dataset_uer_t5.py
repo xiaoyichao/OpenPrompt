@@ -2,23 +2,23 @@
 # TokenizerWrapper to do tasks that are not in the default configuration
 # of
 
-from openprompt.pipeline_base import PromptForGeneration
-from openprompt.prompts.generation_verbalizer import GenerationVerbalizer
+from openprompt4distilbert.pipeline_base import PromptForGeneration
+from openprompt4distilbert.prompts.generation_verbalizer import GenerationVerbalizer
 from tqdm import tqdm
-from openprompt.data_utils import PROCESSORS
+from openprompt4distilbert.data_utils import PROCESSORS
 import torch
-from openprompt.data_utils.utils import InputExample
+from openprompt4distilbert.data_utils.utils import InputExample
 import argparse
 import numpy as np
 
-from openprompt import PromptDataLoader
-from openprompt.prompts import ManualVerbalizer
-from openprompt.prompts import SoftTemplate
-from openprompt import PromptForClassification
+from openprompt4distilbert import PromptDataLoader
+from openprompt4distilbert.prompts import ManualVerbalizer
+from openprompt4distilbert.prompts import SoftTemplate
+from openprompt4distilbert import PromptForClassification
 import time
 import os
 import re
-from openprompt.utils.crossfit_metrics import evaluate as crossfit_evaluate
+from openprompt4distilbert.utils.crossfit_metrics import evaluate as crossfit_evaluate
 
 
 parser = argparse.ArgumentParser("")
@@ -36,7 +36,7 @@ args.result_file = os.path.join(args.project_root, args.result_file)
 # Different from the other scripts, here the combination of tokenizer and model
 # is not in the default configurations of openprompt.
 # So we load the tokenizer and model separately.
-from transformers import BertTokenizer, MT5ForConditionalGeneration, Text2TextGenerationPipeline
+from transformers4token import BertTokenizer, MT5ForConditionalGeneration, Text2TextGenerationPipeline
 tokenizer = BertTokenizer.from_pretrained("uer/t5-v1_1-base-chinese-cluecorpussmall")
 model = MT5ForConditionalGeneration.from_pretrained("uer/t5-v1_1-base-chinese-cluecorpussmall")
 text2text_generator = Text2TextGenerationPipeline(model, tokenizer)
@@ -44,7 +44,7 @@ generated_text = text2text_generator("中国的首都是extra0京", max_length=5
 print(generated_text)
 
 # Then we slightly modify the Tokenizer wrapper to change the mask token to the BertTokenizer's mask token.
-from openprompt.plms.seq2seq import T5TokenizerWrapper
+from openprompt4distilbert.plms.seq2seq import T5TokenizerWrapper
 class T5BertTokenizerWrapper(T5TokenizerWrapper):
     def mask_token(self, id):
         return f"extra{id}"
@@ -92,7 +92,7 @@ dataset['val'] = load_local_dataset(split="valid")
 
 
 
-from openprompt.prompts import ManualTemplate
+from openprompt4distilbert.prompts import ManualTemplate
 mytemplate = ManualTemplate(tokenizer=tokenizer, text="""一：{"meta":"choice0"}； 二： {"meta":"choice1"}； 三： {"meta":"choice2"}； 四：{"meta":"choice3"}。哪一句表达了下面的意思: {"meta":"translation", "shortenable":True, "post_processing": lambda x:x.strip('。')}？第{"mask"}句。 """)
 myverbalizer = GenerationVerbalizer(tokenizer, label_words={0:"一", 1:"二", 2: "三", 3:"四"}, is_rule=False)
 train_dataloader = PromptDataLoader(dataset=dataset["train"], template=mytemplate, verbalizer=myverbalizer, # be sure to add verbalizer
@@ -141,8 +141,8 @@ def evaluate(prompt_model, dataloader):
     return score
 
 
-from transformers import  AdamW, get_linear_schedule_with_warmup,get_constant_schedule_with_warmup  # use AdamW is a standard practice for transformer
-from transformers.optimization import Adafactor  # use Adafactor is the default setting for T5
+from transformers4token import  AdamW, get_linear_schedule_with_warmup,get_constant_schedule_with_warmup  # use AdamW is a standard practice for transformer
+from transformers4token.optimization import Adafactor  # use Adafactor is the default setting for T5
 loss_func = torch.nn.CrossEntropyLoss()
 
 tot_step = args.max_steps

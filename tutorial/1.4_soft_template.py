@@ -1,14 +1,14 @@
 from tqdm import tqdm
-from openprompt.data_utils import PROCESSORS
+from openprompt4distilbert.data_utils import PROCESSORS
 import torch
-from openprompt.data_utils.utils import InputExample
+from openprompt4distilbert.data_utils.utils import InputExample
 import argparse
 import numpy as np
 
-from openprompt import PromptDataLoader
-from openprompt.prompts import ManualVerbalizer
-from openprompt.prompts import SoftTemplate
-from openprompt import PromptForClassification
+from openprompt4distilbert import PromptDataLoader
+from openprompt4distilbert.prompts import ManualVerbalizer
+from openprompt4distilbert.prompts import SoftTemplate
+from openprompt4distilbert import PromptForClassification
 import time
 import os
 
@@ -58,15 +58,15 @@ print(content_write)
 import random
 this_run_unicode = str(random.randint(0, 1e10))
 
-from openprompt.utils.reproduciblity import set_seed
+from openprompt4distilbert.utils.reproduciblity import set_seed
 set_seed(args.seed)
 
 # use lm-adapted version or t5-v1.1 checkpoint. Note that the original t5 checkpoint has been pretrained
 # on part of GLUE dataset, thus should not be used.
-from openprompt.plms.seq2seq import T5TokenizerWrapper, T5LMTokenizerWrapper
-from transformers import T5Config, T5Tokenizer, T5ForConditionalGeneration
-from openprompt.data_utils.data_sampler import FewShotSampler
-from openprompt.plms import load_plm
+from openprompt4distilbert.plms.seq2seq import T5TokenizerWrapper, T5LMTokenizerWrapper
+from transformers4token import T5Config, T5Tokenizer, T5ForConditionalGeneration
+from openprompt4distilbert.data_utils.data_sampler import FewShotSampler
+from openprompt4distilbert.plms import load_plm
 
 plm, tokenizer, model_config, WrapperClass = load_plm(args.model, args.model_name_or_path)
 dataset = {}
@@ -286,8 +286,8 @@ def evaluate(prompt_model, dataloader, desc):
     acc = sum([int(i==j) for i,j in zip(allpreds, alllabels)])/len(allpreds)
     return acc
 
-from transformers import  AdamW, get_linear_schedule_with_warmup,get_constant_schedule_with_warmup  # use AdamW is a standard practice for transformer
-from transformers.optimization import Adafactor, AdafactorSchedule  # use Adafactor is the default setting for T5
+from transformers4token import  AdamW, get_linear_schedule_with_warmup,get_constant_schedule_with_warmup  # use AdamW is a standard practice for transformer
+from transformers4token.optimization import Adafactor, AdafactorSchedule  # use Adafactor is the default setting for T5
 loss_func = torch.nn.CrossEntropyLoss()
 
 tot_step = args.max_steps

@@ -10,7 +10,7 @@
 # parser = argparse.ArgumentParser("")
 # parser.add_argument("--lr", type=float, default=5e-5)
 # args = parser.parse_args()
-from openprompt.data_utils.text_classification_dataset import SST2Processor
+from openprompt4distilbert.data_utils.text_classification_dataset import SST2Processor
 dataset = {}
 dataset['train'] = SST2Processor().get_train_examples("../datasets/TextClassification/SST-2/16-shot/16-13")
 dataset['validation'] = SST2Processor().get_dev_examples("../datasets/TextClassification/SST-2/16-shot/16-13")
@@ -24,17 +24,17 @@ dataset['test'] = SST2Processor().get_test_examples("../datasets/TextClassificat
 
 # %%
 print('load model...')
-from openprompt.plms import load_plm
+from openprompt4distilbert.plms import load_plm
 # load mlm model for main tasks
 plm, tokenizer, model_config, WrapperClass = load_plm("roberta", "roberta-large")
 
 # load generation model for template generation
 template_generate_model, template_generate_tokenizer, template_generate_model_config, template_tokenizer_wrapper = load_plm('t5', 't5-large')
 
-from openprompt.prompts import ManualVerbalizer, ManualTemplate
+from openprompt4distilbert.prompts import ManualVerbalizer, ManualTemplate
 verbalizer = ManualVerbalizer(tokenizer=tokenizer, num_classes=2, label_words=[['terrible'],['great']])
 
-from openprompt.prompts.prompt_generator import LMBFFTemplateGenerationTemplate
+from openprompt4distilbert.prompts.prompt_generator import LMBFFTemplateGenerationTemplate
 template = LMBFFTemplateGenerationTemplate(tokenizer=template_generate_tokenizer, verbalizer=verbalizer, text='{"placeholder":"text_a"} {"mask"} {"meta":"labelword"} {"mask"}.')
 # template = ManualTemplate(tokenizer=tokenizer, text='{"placeholder":"text_a"} It is {"mask"}.')
 
@@ -51,14 +51,14 @@ auto_v = True # whether to perform automatic label word generation
 
 # %%
 # train util function
-from openprompt.plms import load_plm
-from openprompt.prompts.prompt_generator import T5TemplateGenerator
-from openprompt.pipeline_base import PromptDataLoader, PromptForClassification
-from openprompt.prompts import ManualTemplate
-from openprompt.trainer import ClassificationRunner
+from openprompt4distilbert.plms import load_plm
+from openprompt4distilbert.prompts.prompt_generator import T5TemplateGenerator
+from openprompt4distilbert.pipeline_base import PromptDataLoader, PromptForClassification
+from openprompt4distilbert.prompts import ManualTemplate
+from openprompt4distilbert.trainer import ClassificationRunner
 import copy
 import torch
-from transformers import  AdamW, get_linear_schedule_with_warmup
+from transformers4token import  AdamW, get_linear_schedule_with_warmup
 
 
 def fit(model, train_dataloader, val_dataloader, loss_func, optimizer):
@@ -165,7 +165,7 @@ if auto_t:
 
 # %%
 # verbalizer generation
-from openprompt.prompts.prompt_generator import RobertaVerbalizerGenerator
+from openprompt4distilbert.prompts.prompt_generator import RobertaVerbalizerGenerator
 if auto_v:
     print('performing auto_v...')
     # load generation model for template generation

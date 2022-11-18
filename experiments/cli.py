@@ -4,20 +4,20 @@ sys.path.append(".")
 
 import argparse
 
-from openprompt.trainer import ClassificationRunner, GenerationRunner
-from openprompt.lm_bff_trainer import LMBFFClassificationRunner
-from openprompt.protoverb_trainer import ProtoVerbClassificationRunner
+from openprompt4distilbert.trainer import ClassificationRunner, GenerationRunner
+from openprompt4distilbert.lm_bff_trainer import LMBFFClassificationRunner
+from openprompt4distilbert.protoverb_trainer import ProtoVerbClassificationRunner
 from re import template
-from openprompt.pipeline_base import PromptForClassification, PromptForGeneration
-from openprompt.utils.reproduciblity import set_seed
-from openprompt import PromptDataLoader
-from openprompt.prompts import load_template, load_verbalizer, load_template_generator, load_verbalizer_generator
-from openprompt.data_utils import FewShotSampler
-from openprompt.utils.logging import config_experiment_dir, init_logger, logger
-from openprompt.config import get_config, save_config_to_yaml
-from openprompt.plms import load_plm_from_config
-from openprompt.data_utils import load_dataset
-from openprompt.utils.cuda import model_to_device
+from openprompt4distilbert.pipeline_base import PromptForClassification, PromptForGeneration
+from openprompt4distilbert.utils.reproduciblity import set_seed
+from openprompt4distilbert import PromptDataLoader
+from openprompt4distilbert.prompts import load_template, load_verbalizer, load_template_generator, load_verbalizer_generator
+from openprompt4distilbert.data_utils import FewShotSampler
+from openprompt4distilbert.utils.logging import config_experiment_dir, init_logger, logger
+from openprompt4distilbert.config import get_config, save_config_to_yaml
+from openprompt4distilbert.plms import load_plm_from_config
+from openprompt4distilbert.data_utils import load_dataset
+from openprompt4distilbert.utils.cuda import model_to_device
 
 
 

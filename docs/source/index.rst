@@ -4,7 +4,7 @@ OpenPrompt Documentation
 =============================
 Prompt-learning is the latest paradigm to adapt pre-trained language models (PLMs) to downstream NLP tasks, which modifies the input text with a textual template and directly uses PLMs to conduct pre-trained tasks. 
 *OpenPrompt* is a library built upon `PyTorch <https://pytorch.org/>`_ and provides a standard, flexible and extensible framework to deploy the prompt-learning pipeline.
-OpenPrompt supports loading PLMs directly from `huggingface transformers <https://huggingface.co/transformers/>`_. 
+OpenPrompt supports loading PLMs directly from `huggingface transformers4token <https://huggingface.co/transformers4token/>`_. 
 In the future, we will also support PLMs implemented by other libraries.
 
 If you find OpenPrompt useful, please kindly cite our `paper <https://arxiv.org/abs/2111.01998>`_.

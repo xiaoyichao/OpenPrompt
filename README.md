@@ -42,7 +42,7 @@
 
 ## Overview
 
-**Prompt-learning** is the latest paradigm to adapt pre-trained language models (PLMs) to downstream NLP tasks, which modifies the input text with a textual template and directly uses PLMs to conduct pre-trained tasks. This library provides a standard, flexible and extensible framework to deploy the prompt-learning pipeline. OpenPrompt supports loading PLMs directly from [huggingface transformers](https://github.com/huggingface/transformers). In the future, we will also support PLMs implemented by other libraries. For more resources about prompt-learning, please check our [paper list](https://github.com/thunlp/PromptPapers).
+**Prompt-learning** is the latest paradigm to adapt pre-trained language models (PLMs) to downstream NLP tasks, which modifies the input text with a textual template and directly uses PLMs to conduct pre-trained tasks. This library provides a standard, flexible and extensible framework to deploy the prompt-learning pipeline. OpenPrompt supports loading PLMs directly from [huggingface transformers4token](https://github.com/huggingface/transformers4token). In the future, we will also support PLMs implemented by other libraries. For more resources about prompt-learning, please check our [paper list](https://github.com/thunlp/PromptPapers).
 
 
 
@@ -142,7 +142,7 @@ dataset = [ # For simplicity, there's only two examples
 
 #### Step 2: Define a Pre-trained Language Models (PLMs) as backbone.
 
-Choose a PLM to support your task. Different models have different attributes, we encourge you to use OpenPrompt to explore the potential of various PLMs. OpenPrompt is compatible with models on [huggingface](https://huggingface.co/transformers/).
+Choose a PLM to support your task. Different models have different attributes, we encourge you to use OpenPrompt to explore the potential of various PLMs. OpenPrompt is compatible with models on [huggingface](https://huggingface.co/transformers4token/).
 
 ```python
 from openprompt.plms import load_plm
